@@ -1,4 +1,7 @@
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Star } from "lucide-react";
+import { useState } from "react";
 
 export const StockList = () => {
   // Mockup data - in a real app this would come from an API
@@ -10,21 +13,52 @@ export const StockList = () => {
     { symbol: "NVDA", name: "NVIDIA Corp.", price: 411.17, change: 5.67, volume: "28.9M" },
   ];
 
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    const saved = localStorage.getItem('favoriteStocks');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const toggleFavorite = (symbol: string) => {
+    const newFavorites = favorites.includes(symbol)
+      ? favorites.filter(s => s !== symbol)
+      : [...favorites, symbol];
+    setFavorites(newFavorites);
+    localStorage.setItem('favoriteStocks', JSON.stringify(newFavorites));
+  };
+
+  // Filter stocks to show favorites first
+  const sortedStocks = [...stocks].sort((a, b) => {
+    const aFav = favorites.includes(a.symbol) ? -1 : 1;
+    const bFav = favorites.includes(b.symbol) ? -1 : 1;
+    return aFav - bFav;
+  });
+
   return (
     <Card className="p-4">
       <div className="space-y-4">
-        <div className="grid grid-cols-5 text-sm font-medium text-gray-500 p-2">
+        <div className="grid grid-cols-6 text-sm font-medium text-gray-500 p-2">
+          <div>Favorite</div>
           <div>Symbol</div>
           <div>Name</div>
           <div className="text-right">Price</div>
           <div className="text-right">Change</div>
           <div className="text-right">Volume</div>
         </div>
-        {stocks.map((stock) => (
+        {sortedStocks.map((stock) => (
           <div
             key={stock.symbol}
-            className="grid grid-cols-5 items-center p-2 hover:bg-gray-50 rounded-lg"
+            className="grid grid-cols-6 items-center p-2 hover:bg-gray-50 rounded-lg"
           >
+            <div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => toggleFavorite(stock.symbol)}
+                className={favorites.includes(stock.symbol) ? "text-yellow-500" : "text-gray-400"}
+              >
+                <Star className="h-4 w-4" fill={favorites.includes(stock.symbol) ? "currentColor" : "none"} />
+              </Button>
+            </div>
             <div className="font-mono font-medium text-blue-600">{stock.symbol}</div>
             <div className="text-gray-900">{stock.name}</div>
             <div className="text-right font-mono">${stock.price.toFixed(2)}</div>
