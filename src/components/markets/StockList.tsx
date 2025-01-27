@@ -1,11 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Star, Plus } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export const StockList = () => {
   // Mockup data - in a real app this would come from an API
-  const stocks = [
+  const defaultStocks = [
     { symbol: "AAPL", name: "Apple Inc.", price: 175.84, change: 2.34, volume: "45.2M" },
     { symbol: "MSFT", name: "Microsoft", price: 338.11, change: -1.23, volume: "22.1M" },
     { symbol: "GOOGL", name: "Alphabet Inc.", price: 125.23, change: 0.87, volume: "18.5M" },
@@ -13,10 +15,18 @@ export const StockList = () => {
     { symbol: "NVDA", name: "NVIDIA Corp.", price: 411.17, change: 5.67, volume: "28.9M" },
   ];
 
+  const [stocks, setStocks] = useState(() => {
+    const saved = localStorage.getItem('customStocks');
+    return saved ? JSON.parse(saved) : defaultStocks;
+  });
+
   const [favorites, setFavorites] = useState<string[]>(() => {
     const saved = localStorage.getItem('favoriteStocks');
     return saved ? JSON.parse(saved) : [];
   });
+
+  const [newSymbol, setNewSymbol] = useState("");
+  const [newName, setNewName] = useState("");
 
   const toggleFavorite = (symbol: string) => {
     const newFavorites = favorites.includes(symbol)
@@ -24,6 +34,28 @@ export const StockList = () => {
       : [...favorites, symbol];
     setFavorites(newFavorites);
     localStorage.setItem('favoriteStocks', JSON.stringify(newFavorites));
+  };
+
+  const addNewStock = () => {
+    if (!newSymbol || !newName) {
+      toast.error("Please fill in both symbol and name");
+      return;
+    }
+
+    const newStock = {
+      symbol: newSymbol.toUpperCase(),
+      name: newName,
+      price: Math.random() * 1000, // Mock price
+      change: (Math.random() * 10) - 5, // Mock change
+      volume: `${Math.floor(Math.random() * 100)}M`, // Mock volume
+    };
+
+    const updatedStocks = [...stocks, newStock];
+    setStocks(updatedStocks);
+    localStorage.setItem('customStocks', JSON.stringify(updatedStocks));
+    setNewSymbol("");
+    setNewName("");
+    toast.success("Stock added successfully!");
   };
 
   // Filter stocks to show favorites first
@@ -36,6 +68,25 @@ export const StockList = () => {
   return (
     <Card className="p-4">
       <div className="space-y-4">
+        <div className="flex gap-2 mb-4">
+          <Input
+            placeholder="Symbol (e.g. AAPL)"
+            value={newSymbol}
+            onChange={(e) => setNewSymbol(e.target.value)}
+            className="w-32"
+          />
+          <Input
+            placeholder="Name (e.g. Apple Inc.)"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            className="flex-1"
+          />
+          <Button onClick={addNewStock}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Stock
+          </Button>
+        </div>
+
         <div className="grid grid-cols-6 text-sm font-medium text-gray-500 p-2">
           <div>Favorite</div>
           <div>Symbol</div>
