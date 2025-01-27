@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Star, Plus } from "lucide-react";
+import { Star, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -33,6 +33,21 @@ export const CryptoList = () => {
       : [...favorites, symbol];
     setFavorites(newFavorites);
     localStorage.setItem('favoriteCryptos', JSON.stringify(newFavorites));
+  };
+
+  const removeCrypto = (symbol: string) => {
+    const updatedCryptos = cryptos.filter(crypto => crypto.symbol !== symbol);
+    setCryptos(updatedCryptos);
+    localStorage.setItem('customCryptos', JSON.stringify(updatedCryptos));
+    
+    // Also remove from favorites if it was favorited
+    if (favorites.includes(symbol)) {
+      const newFavorites = favorites.filter(s => s !== symbol);
+      setFavorites(newFavorites);
+      localStorage.setItem('favoriteCryptos', JSON.stringify(newFavorites));
+    }
+    
+    toast.success("Cryptocurrency removed successfully!");
   };
 
   const addNewCrypto = () => {
@@ -86,18 +101,19 @@ export const CryptoList = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-6 text-sm font-medium text-gray-500 p-2">
+        <div className="grid grid-cols-7 text-sm font-medium text-gray-500 p-2">
           <div>Favorite</div>
           <div>Symbol</div>
           <div>Name</div>
           <div className="text-right">Price</div>
           <div className="text-right">Change</div>
           <div className="text-right">Volume</div>
+          <div className="text-right">Actions</div>
         </div>
         {sortedCryptos.map((crypto) => (
           <div
             key={crypto.symbol}
-            className="grid grid-cols-6 items-center p-2 hover:bg-gray-50 rounded-lg"
+            className="grid grid-cols-7 items-center p-2 hover:bg-gray-50 rounded-lg"
           >
             <div>
               <Button
@@ -118,6 +134,16 @@ export const CryptoList = () => {
               {crypto.change >= 0 ? '+' : ''}{crypto.change}%
             </div>
             <div className="text-right text-gray-500">{crypto.volume}</div>
+            <div className="text-right">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => removeCrypto(crypto.symbol)}
+                className="text-red-500 hover:text-red-600"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         ))}
       </div>

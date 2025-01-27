@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Star, Plus } from "lucide-react";
+import { Star, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -34,6 +34,21 @@ export const StockList = () => {
       : [...favorites, symbol];
     setFavorites(newFavorites);
     localStorage.setItem('favoriteStocks', JSON.stringify(newFavorites));
+  };
+
+  const removeStock = (symbol: string) => {
+    const updatedStocks = stocks.filter(stock => stock.symbol !== symbol);
+    setStocks(updatedStocks);
+    localStorage.setItem('customStocks', JSON.stringify(updatedStocks));
+    
+    // Also remove from favorites if it was favorited
+    if (favorites.includes(symbol)) {
+      const newFavorites = favorites.filter(s => s !== symbol);
+      setFavorites(newFavorites);
+      localStorage.setItem('favoriteStocks', JSON.stringify(newFavorites));
+    }
+    
+    toast.success("Stock removed successfully!");
   };
 
   const addNewStock = () => {
@@ -87,18 +102,19 @@ export const StockList = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-6 text-sm font-medium text-gray-500 p-2">
+        <div className="grid grid-cols-7 text-sm font-medium text-gray-500 p-2">
           <div>Favorite</div>
           <div>Symbol</div>
           <div>Name</div>
           <div className="text-right">Price</div>
           <div className="text-right">Change</div>
           <div className="text-right">Volume</div>
+          <div className="text-right">Actions</div>
         </div>
         {sortedStocks.map((stock) => (
           <div
             key={stock.symbol}
-            className="grid grid-cols-6 items-center p-2 hover:bg-gray-50 rounded-lg"
+            className="grid grid-cols-7 items-center p-2 hover:bg-gray-50 rounded-lg"
           >
             <div>
               <Button
@@ -117,6 +133,16 @@ export const StockList = () => {
               {stock.change >= 0 ? '+' : ''}{stock.change}%
             </div>
             <div className="text-right text-gray-500">{stock.volume}</div>
+            <div className="text-right">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => removeStock(stock.symbol)}
+                className="text-red-500 hover:text-red-600"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         ))}
       </div>
