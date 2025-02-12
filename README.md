@@ -1,8 +1,15 @@
+
 # Welcome to your Lovable project
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/8b18c71a-a1b5-44e5-a288-6830fc8c7167
+
+## Tech Stack
+
+- Framework: Next.js (App Router)
+- UI Library: ShadCN (for components)
+- Styling: Tailwind CSS
 
 ## How can I edit this code?
 
@@ -49,16 +56,6 @@ npm run dev
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
 
 ## How can I deploy this project?
 
