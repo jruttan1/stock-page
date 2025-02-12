@@ -1,5 +1,7 @@
+
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 export const FearGreedIndex = () => {
   // Mockup data - in a real app this would come from an API
@@ -7,6 +9,13 @@ export const FearGreedIndex = () => {
   const sentiment = fearGreedValue > 50 ? "Greed" : "Fear";
   
   const getColor = (value: number) => {
+    if (value >= 75) return "text-green-600";
+    if (value >= 50) return "text-green-500";
+    if (value >= 25) return "text-orange-500";
+    return "text-red-500";
+  };
+
+  const getIndicatorColor = (value: number) => {
     if (value >= 75) return "bg-green-600";
     if (value >= 50) return "bg-green-500";
     if (value >= 25) return "bg-orange-500";
@@ -22,21 +31,22 @@ export const FearGreedIndex = () => {
             <p className="text-sm text-gray-500">Market Sentiment Indicator</p>
           </div>
           <div className="text-right">
-            <span className={`text-3xl font-bold ${getColor(fearGreedValue).replace('bg-', 'text-')}`}>
+            <span className={`text-3xl font-bold ${getColor(fearGreedValue)}`}>
               {fearGreedValue}
             </span>
-            <p className={`text-lg font-medium ${getColor(fearGreedValue).replace('bg-', 'text-')}`}>
+            <p className={`text-lg font-medium ${getColor(fearGreedValue)}`}>
               {sentiment}
             </p>
           </div>
         </div>
         
         <div className="space-y-2">
-          <Progress 
-            value={fearGreedValue} 
-            className="h-4"
-            indicatorClassName={getColor(fearGreedValue)}
-          />
+          <div className="relative">
+            <Progress 
+              value={fearGreedValue} 
+              className={cn("h-4", getIndicatorColor(fearGreedValue))}
+            />
+          </div>
           <div className="flex justify-between text-sm text-gray-500">
             <span>Extreme Fear</span>
             <span>Fear</span>
